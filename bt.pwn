@@ -1,7 +1,10 @@
 /*********************************************************************************
 *			(c) Copyright SVR 2017				         *
-*			  Created by: SVR				 	 *
+*			  Created by: SVR					 *
+* Filename: bt.pwn								 *
+* Author: SVR - Website: https://github.com/SVR1337			 	 *
 *********************************************************************************/
+
 /* Includes, defines, enums and functions. */
 #include <a_samp>
 #include <zcmd>
