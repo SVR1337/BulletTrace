@@ -10,12 +10,6 @@
 #include <zcmd>
 #include <streamer>
 
-#define	    forward %1(%2)     \
-            public %1(%2)
-
-#undef MAX_PLAYERS
-#define MAX_PLAYERS 100
-
 #define PlayerLoop(%1) for(new %1 = 0; %1 < MAX_PLAYERS; %1++) if(IsPlayerConnected(%1) && !IsPlayerNPC(%1))
 
 enum stats
@@ -47,9 +41,8 @@ stock PlayerName(playerid)
 CMD:bt(playerid, params[])
 {
 	if(!IsPlayerAdmin(playerid)) return SendClientMessage(playerid, -1, "Error: {e0e0e0}You are not allowed to use this command!");
-	new 
-		id;
-	if(sscanf(params, "u", id)) return SendClientMessage(playerid, -1, "Usage: {e0e0e0}/bt <PartOfName/playerid>"));
+	new id;
+	if(sscanf(params, "u", id)) return SendClientMessage(playerid, -1, "Usage: {e0e0e0}/bt <PartOfName/playerid>");
 	if(id == -1)
 	{
 		PlayerLoop(i)
@@ -64,20 +57,19 @@ CMD:bt(playerid, params[])
 	}
 	pStat[id][Bttraceby] = playerid;
 	pStat[id][Bttrace] = true;
-	pStat[playerid][bt] = id;
+	pStat[playerid][Bt] = id;
 	format(global, sizeof global, "[/bt]: {e0e0e0}You are now tracing bullets of %s (ID: %d).", PlayerName(id), id);
 	SendClientMessage(playerid, -1, global);
 	return 1;
 }
-CMD:checkbt(playerid, params[]);
+CMD:checkbt(playerid, params[])
 {
 	if(!IsPlayerAdmin(playerid)) return SendClientMessage(playerid, -1, "Error: {e0e0e0}You are not allowed to use this command!");
-	new 
-		id;
-	if(sscanf(params, "u", id)) return SendClientMessage(playerid, "Usage: {e0e0e0}/checkbt <PartOfName/playerid>");
-	format(global, sizeof global, "[/bt]: {e0e0e0}Checking %s (ID: %d)!", PlayerName(id), id);
+	new id1;
+	if(sscanf(params, "u", id1)) return SendClientMessage(playerid, -1, "Usage: {e0e0e0}/checkbt <PartOfName/playerid>");
+	format(global, sizeof global, "[/bt]: {e0e0e0}Checking %s (ID: %d)!", PlayerName(id1), id1);
 	SendClientMessage(playerid, -1, global);
-	format(global, sizeof global, " Shots Missed: {ff0000}%i {e0e0e0}| {ffffff}Shots Hit: {ff0000}%i", pStat[id][Shots], pStat[id][ShotsHit]);
+	format(global, sizeof global, " Shots Missed: {ff0000}%i {e0e0e0}| {ffffff}Shots Hit: {ff0000}%i", pStat[id1][Shots], pStat[id1][ShotsHit]);
 	SendClientMessage(playerid, -1, global);
 	return 1;
 }
@@ -103,20 +95,19 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 			}
 			if(hittype == 2)
 			{
-				format(global, sizeof global, "[/bt]: {ff0000}%s(%d) HIT_VEHICLE (%i/%i)", PlayerName(playerid), playerid);
+				format(global, sizeof global, "[/bt]: {ff0000}%s(%d) HIT_VEHICLE (%i/%i)", PlayerName(playerid), playerid, pStat[playerid][ShotsHit], pStat[playerid][Shots]);
 				SendClientMessage(i, -1, global);
 			}
 			else
 			{
-				format(global, sizeof global, "[/bt]: {ff0000}%s(%d) MISS (%i/%i)", PlayerName(playerid), playerid);
+				format(global, sizeof global, "[/bt]: {ff0000}%s(%d) MISS (%i/%i)", PlayerName(playerid), playerid, pStat[playerid][ShotsHit], pStat[playerid][Shots]);
 				SendClientMessage(i, -1, global);
 			}
 		}
 	}
 	if(pStat[playerid][Bttrace])
 	{
-		new 
-			objectid = CreateDynamicObject(19836, fX, fY, fZ, 0, 90, 0, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), pStat[playerid][Bttraceby], 150);
+		new	objectid = CreateDynamicObject(19836, fX, fY, fZ, 0, 90, 0, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), pStat[playerid][Bttraceby], 150);
 		SetTimerEx("RemoveObject", 3500, false, "i", objectid);
 	}
 	return 1;
@@ -134,12 +125,11 @@ public OnPlayerGiveDamage(playerid, damagedid, Float: amount, weaponid, bodypart
 {
 	if(pStat[playerid][Bttrace])
 	{
-            new 
-		Float:f1, Float:f2, Float:f3,
-            	Float:f4, Float:f5, Float:f6;
-            GetPlayerLastShotVectors(playerid, f1, f2, f3, f4, f5, f6);
-	    new 
-			objectid = CreateDynamicObject(19836, f4, f5, f6, 0, 90, 0, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), pStat[playerid][Bttraceby], 150);
+        new Float:f1, Float:f2, Float:f3,
+            Float:f4, Float:f5, Float:f6;
+        GetPlayerLastShotVectors(playerid, f1, f2, f3, f4, f5, f6);
+        
+	    new objectid = CreateDynamicObject(19836, f4, f5, f6, 0, 90, 0, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), pStat[playerid][Bttraceby], 150);
 	    SetTimerEx("RemoveObject", 3500, false, "i", objectid);
 	}
 	return 1;
